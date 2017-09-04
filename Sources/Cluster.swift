@@ -93,6 +93,10 @@ open class ClusterManager {
     open var annotations: [MKAnnotation] {
         return tree.annotations(in: MKMapRectWorld)
     }
+    /**
+     The list of annotations that will be exluded from clustering. All annotations in the list will be displayed as a single annotation despite of map  zoom level.
+    */
+    public var exludedAnnotatios = Set<NSObject>()
     
     /**
      The list of visible annotations associated.
@@ -108,6 +112,7 @@ open class ClusterManager {
     open func reload(_ mapView: MKMapView, visibleMapRect: MKMapRect) {
         let zoomScale = ZoomScale(mapView.bounds.width) / visibleMapRect.size.width
         let (toAdd, toRemove) = clusteredAnnotations(mapView, zoomScale: zoomScale, visibleMapRect: visibleMapRect)
+        
         mapView.removeAnnotations(toRemove)
         mapView.addAnnotations(toAdd)
         visibleAnnotations.subtract(Set(toRemove as! [NSObject]))
@@ -184,7 +189,10 @@ open class ClusterManager {
             toRemove.subtract(Set(nonRemoving))
         }
         
-        return (toAdd: Array(toAdd) as! [MKAnnotation], toRemove: Array(toRemove) as! [MKAnnotation])
+        let toRemoveWithoutExcluded = toRemove.subtracting(exludedAnnotatios)
+        let toAddWithoutExcluded = toAdd.subtracting(exludedAnnotatios)
+        
+        return (toAdd: Array(toAddWithoutExcluded) as! [MKAnnotation], toRemove: Array(toRemoveWithoutExcluded) as! [MKAnnotation])
     }
     
 }
