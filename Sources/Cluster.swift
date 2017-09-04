@@ -92,6 +92,11 @@ open class ClusterManager {
     }
     
     /**
+     The list of annotations that will be exluded from clustering. All annotations in the list will be displayed as a single annotation despite of map  zoom level.
+     */
+    public var exludedAnnotatios = Set<NSObject>()
+    
+    /**
      Reload the annotations on the map view.
      
      - Parameters:
@@ -175,9 +180,11 @@ open class ClusterManager {
         
         let toAdd = NSMutableSet(set: after)
         toAdd.minus(toKeep as Set<NSObject>)
+        toAdd.minus(exludedAnnotatios)
         
         let toRemove = NSMutableSet(set: before)
         toRemove.minus(after as Set<NSObject>)
+        toRemove.minus(exludedAnnotatios)
         
         return (toAdd: toAdd.allObjects as? [MKAnnotation] ?? [], toRemove: toRemove.allObjects as? [MKAnnotation] ?? [])
     }
